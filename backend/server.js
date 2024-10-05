@@ -9,6 +9,10 @@ const app = express()
 app.use(cors());
 app.use(express.json());
 
+sequelize.authenticate()
+  .then(() => console.log('Database is connected...'))
+  .catch(err => console.log('Error: ' + err));
+
 const PORT = process.env.PORT || 4000
 
 app.get('/', (req, res) => {
