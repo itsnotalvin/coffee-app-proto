@@ -2,9 +2,14 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../models')
+const authMiddleware = require('../middleware/auth'); // JWT middleware
+const userController = require('../controllers/userController');
 require('dotenv').config();
 
 const router = express.Router();
+
+router.get('/profile', authMiddleware, userController.getProfile);
+
 
 router.post('/register', async (req, res) => {
     const { firstName, lastName, email, password } = req.body
@@ -51,7 +56,15 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         })
-        res.json({ token })
+        res.json({ 
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+            }, 
+        })
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error})
     }
